@@ -13,11 +13,12 @@ local function AddGuildNoteToGuildChat(self, event, msg, author, ...)
         local publicNote = FindPublicNoteForPlayer(author)
         local shortName = Ambiguate(author, "short")
 
-        if publicNote and publicNote ~= "" and string.lower(shortName) ~= string.lower(publicNote) then       
-            -- TODO: Appending the note to the message or to the name could be a choice. As part of the message it will have the guild color. As part of the author it will have the author class color. 
-            --msg = "(" .. publicNote .. ") " .. msg
+        if publicNote and publicNote ~= "" and string.lower(shortName) ~= string.lower(publicNote) then
+            -- TODO: Color picker for the note text
+            msg = "|cFFFFFFFF(" .. publicNote .. ")|r " .. msg
+            -- TODO: This method is going to become opt-in via a setting so we can warn about what happens when you click on the name to whipser (note is placed in the whisper)
             -- INFO: Author is in the format of name-realm but in guild this would normally show as name only when on the same realm so we need to ambiguate it
-            author = Ambiguate(author, "guild") .. " (" .. publicNote .. ")"
+            -- author = Ambiguate(author, "guild") .. " (" .. publicNote .. ")"
         end
         return false, msg, author, ...
     end
