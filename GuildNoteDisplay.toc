@@ -5,5 +5,6 @@
 ## Author: Myrhial
 ## SavedVariables: GuildNoteDisplayDB
 ## AddonCompartmentFunc: GuildNoteDisplay_Click
+## IconTexture: Interface\Icons\Inv_misc_notepicture2a
 
 GuildNoteDisplay.lua
