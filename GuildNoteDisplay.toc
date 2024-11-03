@@ -4,5 +4,6 @@
 ## Notes: A simple addon that displays the guild note of a character when they talk in guild chat.
 ## Author: Myrhial
 ## SavedVariables: GuildNoteDisplayDB
+## AddonCompartmentFunc: GuildNoteDisplay_Click
 
 GuildNoteDisplay.lua

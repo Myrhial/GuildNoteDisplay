@@ -65,6 +65,16 @@ function app.ShowColorPicker(configTable)
 	ColorPickerFrame:SetupColorPickerAndShow(options);
 end
 
+-- Open settings
+function app.OpenSettings()
+	Settings.OpenToCategory(app.Category:GetID())
+end
+
+-- AddOn Compartment Click
+function GuildNoteDisplay_Click(self, button)
+    app.OpenSettings()
+end
+
 -- Gets the public note for a player by looping over the number of guild members
 function app.FindPublicNoteForPlayer(nameWithRealm)
     for i = 1, GetNumGuildMembers() do
