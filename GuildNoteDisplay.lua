@@ -27,6 +27,10 @@ function app.Initialise()
 			b=1,
 		}
     end
+
+	if GuildNoteDisplayDB["note_in_author_field"] == nil then 
+		GuildNoteDisplayDB["note_in_author_field"] = false
+	end
 end
 
 -- Addon is loaded
@@ -93,10 +97,12 @@ function app.AddGuildNoteToGuildChat(self, event, msg, author, ...)
 
         if publicNote and publicNote ~= "" and string.lower(shortName) ~= string.lower(publicNote) then
             local textColor = CreateColor(GuildNoteDisplayDB.note_colour_table.r, GuildNoteDisplayDB.note_colour_table.g, GuildNoteDisplayDB.note_colour_table.b, GuildNoteDisplayDB.note_colour_table.a);
-            msg = "|c" .. textColor:GenerateHexColor() .. "(" .. publicNote .. ")|r " .. msg
-            -- TODO: This method is going to become opt-in via a setting so we can warn about what happens when you click on the name to whipser (note is placed in the whisper)
-            -- INFO: Author is in the format of name-realm but in guild this would normally show as name only when on the same realm so we need to ambiguate it
-            -- author = Ambiguate(author, "guild") .. " (" .. publicNote .. ")"
+			if not GuildNoteDisplayDB["note_in_author_field"] then
+				msg = "|c" .. textColor:GenerateHexColor() .. "(" .. publicNote .. ")|r " .. msg
+			else
+				 -- INFO: Author is in the format of name-realm but in guild this would normally show as name only when on the same realm so we need to ambiguate it
+            	author = Ambiguate(author, "guild") .. " (" .. publicNote .. ")"
+			end          
         end
         return false, msg, author, ...
     end
@@ -114,6 +120,28 @@ function app.Settings()
 
 	layout:AddInitializer(CreateSettingsListSectionHeaderInitializer(C_AddOns.GetAddOnMetadata(appName, "Version")))
 
+	local CreateCheckbox = Settings.CreateCheckbox or Settings.CreateCheckBox
+
+	local function OnSettingChanged(_, setting, value)
+		local variable = setting:GetVariable()
+
+		if strsub(variable, 1, 17) == "GuildNoteDisplay_" then
+			variable = strsub(variable, 17);
+		end
+	end
+
+	local function RegisterSetting(variableKey, defaultValue, name)
+		local uniqueVariable = "GuildNoteDisplay_" .. variableKey;
+
+		local setting;
+		setting = Settings.RegisterAddOnSetting(category, uniqueVariable, variableKey, GuildNoteDisplayDB, type(defaultValue), name, defaultValue);
+
+		setting:SetValue(GuildNoteDisplayDB[variableKey]);
+		Settings.SetOnValueChangedCallback(uniqueVariable, OnSettingChanged);
+
+		return setting;
+	end
+
     do -- color picker
         local function OnButtonClick()
             app.ShowColorPicker(GuildNoteDisplayDB.note_colour_table)
@@ -122,4 +150,14 @@ function app.Settings()
         local initializer = CreateSettingsButtonInitializer("Guild note colour", "Click to pick a colour", OnButtonClick, nil, true);
         layout:AddInitializer(initializer);
     end
+
+	do -- checkbox
+		local variable = "note_in_author_field"
+		local name = "Note in name field"
+		local tooltip = "This will show the note in brackets after the character name, rather than at the start of the message.|n|n|cFFFF0000Important warning: If you click the name of the character to whisper, the note will be placed in the whisper. This is an annoying side effect I cannot work around, and why this option is not the default. By using this option, you agree to live with this side effect.|r"
+		local defaultValue = false
+
+		local setting = RegisterSetting(variable, defaultValue, name)
+		CreateCheckbox(category, setting, tooltip)
+	end
 end
