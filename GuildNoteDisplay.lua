@@ -20,6 +20,10 @@ function app.Initialise()
 	if not GuildNoteDisplayDB then GuildNoteDisplayDB = {} end
 	
 	-- Enable default user settings
+	if GuildNoteDisplayDB["colour_guild_note"] == nil then 
+		GuildNoteDisplayDB["colour_guild_note"] = true
+	end
+
 	if GuildNoteDisplayDB["note_colour_table"] == nil then 
         GuildNoteDisplayDB["note_colour_table"] = {
 			r=1,
@@ -98,7 +102,11 @@ function app.AddGuildNoteToGuildChat(self, event, msg, author, ...)
         if publicNote and publicNote ~= "" and string.lower(shortName) ~= string.lower(publicNote) then
             local textColor = CreateColor(GuildNoteDisplayDB.note_colour_table.r, GuildNoteDisplayDB.note_colour_table.g, GuildNoteDisplayDB.note_colour_table.b, GuildNoteDisplayDB.note_colour_table.a);
 			if not GuildNoteDisplayDB["note_in_author_field"] then
-				msg = "|c" .. textColor:GenerateHexColor() .. "(" .. publicNote .. ")|r " .. msg
+				if GuildNoteDisplayDB["colour_guild_note"] then
+					msg = "|c" .. textColor:GenerateHexColor() .. "(" .. publicNote .. ")|r " .. msg
+				else
+					msg = "(" .. publicNote .. ") " .. msg				
+				end				
 			else
 				 -- INFO: Author is in the format of name-realm but in guild this would normally show as name only when on the same realm so we need to ambiguate it
             	author = Ambiguate(author, "guild") .. " (" .. publicNote .. ")"
@@ -140,6 +148,16 @@ function app.Settings()
 		Settings.SetOnValueChangedCallback(uniqueVariable, OnSettingChanged);
 
 		return setting;
+	end
+
+	do -- checkbox
+		local variable = "colour_guild_note"
+		local name = "Colour guild note"
+		local tooltip = "Apply the colour chosen with the 'guild note colour' setting to the guild note in the chat messages"
+		local defaultValue = true
+
+		local setting = RegisterSetting(variable, defaultValue, name)
+		CreateCheckbox(category, setting, tooltip)
 	end
 
     do -- color picker
