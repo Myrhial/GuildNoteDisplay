@@ -35,6 +35,10 @@ function app.Initialise()
 	if GuildNoteDisplayDB["note_in_author_field"] == nil then 
 		GuildNoteDisplayDB["note_in_author_field"] = false
 	end
+
+	if GuildNoteDisplayDB["normalise_special_characters"] == nil then 
+		GuildNoteDisplayDB["normalise_special_characters"] = false
+	end
 end
 
 -- Addon is loaded
@@ -83,6 +87,79 @@ function GuildNoteDisplay_Click(self, button)
     app.OpenSettings()
 end
 
+-- Normalize special characters
+function app.NormalizeSpecialCharacters(str)
+	local substitutes = {}
+	substitutes["À"] = "A"
+	substitutes["Á"] = "A"
+	substitutes["Â"] = "A"
+	substitutes["Ã"] = "A"
+	substitutes["Ä"] = "A"
+	substitutes["Å"] = "A"
+	substitutes["Æ"] = "AE"
+	substitutes["Ç"] = "C"
+	substitutes["È"] = "E"
+	substitutes["É"] = "E"
+	substitutes["Ê"] = "E"
+	substitutes["Ë"] = "E"
+	substitutes["Ì"] = "I"
+	substitutes["Í"] = "I"
+	substitutes["Î"] = "I"
+	substitutes["Ï"] = "I"
+	substitutes["Ð"] = "D"
+	substitutes["Ñ"] = "N"
+	substitutes["Ò"] = "O"
+	substitutes["Ó"] = "O"
+	substitutes["Ô"] = "O"
+	substitutes["Õ"] = "O"
+	substitutes["Ö"] = "O"
+	substitutes["Ø"] = "O"
+	substitutes["Ù"] = "U"
+	substitutes["Ú"] = "U"
+	substitutes["Û"] = "U"
+	substitutes["Ü"] = "U"
+	substitutes["Ý"] = "Y"
+	substitutes["Þ"] = "P"
+	substitutes["ß"] = "s"
+	substitutes["à"] = "a"
+	substitutes["á"] = "a"
+	substitutes["â"] = "a"
+	substitutes["ã"] = "a"
+	substitutes["ä"] = "a"
+	substitutes["å"] = "a"
+	substitutes["æ"] = "ae"
+	substitutes["ç"] = "c"
+	substitutes["è"] = "e"
+	substitutes["é"] = "e"
+	substitutes["ê"] = "e"
+	substitutes["ë"] = "e"
+	substitutes["ì"] = "i"
+	substitutes["í"] = "i"
+	substitutes["î"] = "i"
+	substitutes["ï"] = "i"
+	substitutes["ð"] = "eth"
+	substitutes["ñ"] = "n"
+	substitutes["ò"] = "o"
+	substitutes["ó"] = "o"
+	substitutes["ô"] = "o"
+	substitutes["õ"] = "o"
+	substitutes["ö"] = "o"
+	substitutes["ø"] = "o"
+	substitutes["ù"] = "u"
+	substitutes["ú"] = "u"
+	substitutes["û"] = "u"
+	substitutes["ü"] = "u"
+	substitutes["ý"] = "y"
+	substitutes["þ"] = "p"
+	substitutes["ÿ"] = "y"
+
+	local normalisedString = ''
+
+	local normalisedString = str: gsub("[%z\1-\127\194-\244][\128-\191]*", substitutes)
+
+	return normalisedString
+end  
+
 -- Gets the public note for a player by looping over the number of guild members
 function app.FindPublicNoteForPlayer(nameWithRealm)
     for i = 1, GetNumGuildMembers() do
@@ -98,8 +175,15 @@ function app.AddGuildNoteToGuildChat(self, event, msg, author, ...)
     if event == "CHAT_MSG_GUILD" then
         local publicNote = app.FindPublicNoteForPlayer(author)
         local shortName = Ambiguate(author, "short")
+		local publicNoteForCompare = publicNote
+		local shortNameForCompare = shortName
 
-        if publicNote and publicNote ~= "" and string.lower(shortName) ~= string.lower(publicNote) then
+		if GuildNoteDisplayDB["normalise_special_characters"] then
+			publicNoteForCompare = app.NormalizeSpecialCharacters(publicNote)
+			shortNameForCompare = app.NormalizeSpecialCharacters(shortName)
+		end
+
+        if publicNote and publicNote ~= "" and string.lower(shortNameForCompare) ~= string.lower(publicNoteForCompare) then
             local textColor = CreateColor(GuildNoteDisplayDB.note_colour_table.r, GuildNoteDisplayDB.note_colour_table.g, GuildNoteDisplayDB.note_colour_table.b, GuildNoteDisplayDB.note_colour_table.a);
 			if not GuildNoteDisplayDB["note_in_author_field"] then
 				if GuildNoteDisplayDB["colour_guild_note"] then
@@ -173,6 +257,16 @@ function app.Settings()
 		local variable = "note_in_author_field"
 		local name = "Note in name field"
 		local tooltip = "This will show the note in brackets after the character name, rather than at the start of the message.|n|n|cFFFF0000Important warning: If you click the name of the character to whisper, the note will be placed in the whisper. This is an annoying side effect I cannot work around, and why this option is not the default. By using this option, you agree to live with this side effect.|r"
+		local defaultValue = false
+
+		local setting = RegisterSetting(variable, defaultValue, name)
+		CreateCheckbox(category, setting, tooltip)
+	end
+
+	do -- checkbox
+		local variable = "normalise_special_characters"
+		local name = "Normalise special characters"
+		local tooltip = "When comparing names, normalise special characters like accents to their base characters. This is useful if your guild uses special characters in names, but you want to compare them to the normal characters. Normalisation will be applied to both the guild note and the character name."
 		local defaultValue = false
 
 		local setting = RegisterSetting(variable, defaultValue, name)

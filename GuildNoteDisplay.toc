@@ -1,4 +1,4 @@
-## Interface: 110005
+## Interface: 110007
 ## Version: @project-version@
 ## X-Curse-Project-ID: 1134192
 ## X-Wago-ID: jK8XqXKy
