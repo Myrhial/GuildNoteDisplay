@@ -39,6 +39,10 @@ function app.Initialise()
 	if GuildNoteDisplayDB["normalise_special_characters"] == nil then 
 		GuildNoteDisplayDB["normalise_special_characters"] = false
 	end
+
+	if GuildNoteDisplayDB["use_officer_note"] == nil then 
+		GuildNoteDisplayDB["use_officer_note"] = false
+	end
 end
 
 -- Addon is loaded
@@ -161,11 +165,13 @@ function app.NormalizeSpecialCharacters(str)
 end  
 
 -- Gets the public note for a player by looping over the number of guild members
-function app.FindPublicNoteForPlayer(nameWithRealm)
+function app.FindGuildNoteForPlayer(nameWithRealm, useOfficerNote)
     for i = 1, GetNumGuildMembers() do
-        local name, _, _, _, _, _, publicNote = GetGuildRosterInfo(i)
-        if name == nameWithRealm then
+        local name, _, _, _, _, _, publicNote, officerNote = GetGuildRosterInfo(i)
+        if name == nameWithRealm and not useOfficerNote then
             return publicNote
+		elseif name == nameWithRealm and useOfficerNote then
+			return officerNote 
         end
     end
 end
@@ -173,27 +179,27 @@ end
 -- Adds the public note to the guild chat
 function app.AddGuildNoteToGuildChat(self, event, msg, author, ...)
     if event == "CHAT_MSG_GUILD" then
-        local publicNote = app.FindPublicNoteForPlayer(author)
+        local guildNote = app.FindGuildNoteForPlayer(author, GuildNoteDisplayDB["use_officer_note"])
         local shortName = Ambiguate(author, "short")
-		local publicNoteForCompare = publicNote
+		local publicNoteForCompare = guildNote
 		local shortNameForCompare = shortName
 
 		if GuildNoteDisplayDB["normalise_special_characters"] then
-			publicNoteForCompare = app.NormalizeSpecialCharacters(publicNote)
+			publicNoteForCompare = app.NormalizeSpecialCharacters(guildNote)
 			shortNameForCompare = app.NormalizeSpecialCharacters(shortName)
 		end
 
-        if publicNote and publicNote ~= "" and string.lower(shortNameForCompare) ~= string.lower(publicNoteForCompare) then
+        if guildNote and guildNote ~= "" and string.lower(shortNameForCompare) ~= string.lower(publicNoteForCompare) then
             local textColor = CreateColor(GuildNoteDisplayDB.note_colour_table.r, GuildNoteDisplayDB.note_colour_table.g, GuildNoteDisplayDB.note_colour_table.b, GuildNoteDisplayDB.note_colour_table.a);
 			if not GuildNoteDisplayDB["note_in_author_field"] then
 				if GuildNoteDisplayDB["colour_guild_note"] then
-					msg = "|c" .. textColor:GenerateHexColor() .. "(" .. publicNote .. ")|r " .. msg
+					msg = "|c" .. textColor:GenerateHexColor() .. "(" .. guildNote .. ")|r " .. msg
 				else
-					msg = "(" .. publicNote .. ") " .. msg				
+					msg = "(" .. guildNote .. ") " .. msg				
 				end				
 			else
 				 -- INFO: Author is in the format of name-realm but in guild this would normally show as name only when on the same realm so we need to ambiguate it
-            	author = Ambiguate(author, "guild") .. " (" .. publicNote .. ")"
+            	author = Ambiguate(author, "guild") .. " (" .. guildNote .. ")"
 			end          
         end
         return false, msg, author, ...
@@ -250,7 +256,7 @@ function app.Settings()
         end
 
         local initializer = CreateSettingsButtonInitializer("Guild note colour", "Click to pick a colour", OnButtonClick, nil, true);
-        layout:AddInitializer(initializer);
+        layout:AddInitializer(initializer)
     end
 
 	do -- checkbox
@@ -267,6 +273,16 @@ function app.Settings()
 		local variable = "normalise_special_characters"
 		local name = "Normalise special characters"
 		local tooltip = "When comparing names, normalise special characters like accents to their base characters. This is useful if your guild uses special characters in names, but you want to compare them to the normal characters. Normalisation will be applied to both the guild note and the character name."
+		local defaultValue = false
+
+		local setting = RegisterSetting(variable, defaultValue, name)
+		CreateCheckbox(category, setting, tooltip)
+	end
+
+	do -- checkbox
+		local variable = "use_officer_note"
+		local name = "Use the officer note"
+		local tooltip = "Use the officer note rather than the public note for the guild note display. |cFFFF0000Must be able to see officer notes for this setting to work correctly!|r"
 		local defaultValue = false
 
 		local setting = RegisterSetting(variable, defaultValue, name)
