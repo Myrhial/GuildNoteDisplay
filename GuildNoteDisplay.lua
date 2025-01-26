@@ -13,6 +13,7 @@ event:SetScript("OnEvent", function(self, event, ...)
 	end
 end)
 event:RegisterEvent("ADDON_LOADED")
+event:RegisterEvent("CHAT_MSG_SYSTEM")
 
 -- Initial load
 function app.Initialise()
@@ -164,7 +165,7 @@ function app.NormalizeSpecialCharacters(str)
 	return normalisedString
 end  
 
--- Gets the public note for a player by looping over the number of guild members
+-- Gets the guild note for a player by looping over the number of guild members
 function app.FindGuildNoteForPlayer(nameWithRealm, useOfficerNote)
     for i = 1, GetNumGuildMembers() do
         local name, _, _, _, _, _, publicNote, officerNote = GetGuildRosterInfo(i)
@@ -176,20 +177,20 @@ function app.FindGuildNoteForPlayer(nameWithRealm, useOfficerNote)
     end
 end
 
--- Adds the public note to the guild chat
+-- Adds the guild note to the guild chat
 function app.AddGuildNoteToGuildChat(self, event, msg, author, ...)
     if event == "CHAT_MSG_GUILD" then
         local guildNote = app.FindGuildNoteForPlayer(author, GuildNoteDisplayDB["use_officer_note"])
         local shortName = Ambiguate(author, "short")
-		local publicNoteForCompare = guildNote
+		local guildNoteForCompare = guildNote
 		local shortNameForCompare = shortName
 
 		if GuildNoteDisplayDB["normalise_special_characters"] then
-			publicNoteForCompare = app.NormalizeSpecialCharacters(guildNote)
+			guildNoteForCompare = app.NormalizeSpecialCharacters(guildNote)
 			shortNameForCompare = app.NormalizeSpecialCharacters(shortName)
 		end
 
-        if guildNote and guildNote ~= "" and string.lower(shortNameForCompare) ~= string.lower(publicNoteForCompare) then
+        if guildNote and guildNote ~= "" and string.lower(shortNameForCompare) ~= string.lower(guildNoteForCompare) then
             local textColor = CreateColor(GuildNoteDisplayDB.note_colour_table.r, GuildNoteDisplayDB.note_colour_table.g, GuildNoteDisplayDB.note_colour_table.b, GuildNoteDisplayDB.note_colour_table.a);
 			if not GuildNoteDisplayDB["note_in_author_field"] then
 				if GuildNoteDisplayDB["colour_guild_note"] then
@@ -206,8 +207,49 @@ function app.AddGuildNoteToGuildChat(self, event, msg, author, ...)
     end
 end
 
+-- Adds the guild note to the login and logout message
+function app.AddGuildNoteToLoginLogoutMessage(self, event, msg, ...)
+    if event == "CHAT_MSG_SYSTEM" then
+		-- Get the name from the login or logout message
+		local subbedMessage = ERR_FRIEND_ONLINE_SS:gsub("%%s", "(%.+)"):gsub("%[", "%%["):gsub("%]","%%]")
+		local author = string.match(msg, subbedMessage)
+		if author == nil then
+			subbedMessage = ERR_FRIEND_OFFLINE_S:gsub("%%s", "(%.+)"):gsub("%[", "%%["):gsub("%]","%%]")
+			author = string.match(msg, subbedMessage)
+		end
+
+		if author ~= nil then
+			-- Author needs the realm name added to it
+			if not strfind(author, "-") then
+				author = author .. "-" .. GetNormalizedRealmName()
+			end
+
+			local guildNote = app.FindGuildNoteForPlayer(author, GuildNoteDisplayDB["use_officer_note"])
+			local shortName = Ambiguate(author, "short")
+			local guildNoteForCompare = guildNote
+			local shortNameForCompare = shortName
+
+			if GuildNoteDisplayDB["normalise_special_characters"] then
+				guildNoteForCompare = app.NormalizeSpecialCharacters(guildNote)
+				shortNameForCompare = app.NormalizeSpecialCharacters(shortName)
+			end
+
+			if guildNote and guildNote ~= "" and string.lower(shortNameForCompare) ~= string.lower(guildNoteForCompare) then
+				local textColor = CreateColor(GuildNoteDisplayDB.note_colour_table.r, GuildNoteDisplayDB.note_colour_table.g, GuildNoteDisplayDB.note_colour_table.b, GuildNoteDisplayDB.note_colour_table.a);
+				if GuildNoteDisplayDB["colour_guild_note"] then
+					msg = "|c" .. textColor:GenerateHexColor() .. "(" .. guildNote .. ")|r " .. msg
+				else
+					msg = "(" .. guildNote .. ") " .. msg				
+				end			        
+			end
+			return false, msg, ...
+		end
+    end
+end
+
 -- Add the event filter
 ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", app.AddGuildNoteToGuildChat)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", app.AddGuildNoteToLoginLogoutMessage)
 
 -- Settings
 function app.Settings()
