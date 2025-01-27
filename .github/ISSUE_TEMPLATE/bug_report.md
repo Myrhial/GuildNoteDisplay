@@ -23,8 +23,9 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - Version [e.g. v1.0.5] (found ingame in the addon settings)
+**Version information**
+Addon Version: [e.g., 1.2.3]
+World of Warcraft Version: [e.g., Retail 9.2.5]
 
 **Additional context**
 Add any other context about the problem here.
