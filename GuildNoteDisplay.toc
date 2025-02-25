@@ -1,4 +1,4 @@
-## Interface: 110007
+## Interface: 110007, 110100
 ## Version: @project-version@
 ## X-Curse-Project-ID: 1134192
 ## X-Wago-ID: jK8XqXKy
@@ -8,5 +8,18 @@
 ## SavedVariables: GuildNoteDisplayDB
 ## AddonCompartmentFunc: GuildNoteDisplay_Click
 ## IconTexture: Interface\AddOns\GuildNoteDisplay\GuildNoteDisplay.blp
+
+# https://warcraft.wiki.gg/wiki/Addon_Categories
+## Category-enUS: Chat
+## Category-deDE: Chat
+## Category-esES: Chat
+## Category-esMX: Chat
+## Category-frFR: Discussion
+## Category-itIT: Chat
+## Category-koKR: 대화
+## Category-ptBR: Bate-papo
+## Category-ruRU: Чат
+## Category-zhCN: 聊天
+## Category-zhTW: 對話
 
 GuildNoteDisplay.lua
