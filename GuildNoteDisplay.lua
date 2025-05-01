@@ -170,6 +170,15 @@ function app.NormalizeSpecialCharacters(str)
 	return normalisedString
 end  
 
+-- Normalises the guild note and compares it to the short name
+function app.NormalizeAndCompare(guildNote, shortName)
+    if GuildNoteDisplayDB["normalise_special_characters"] then
+        guildNote = app.NormalizeSpecialCharacters(guildNote)
+        shortName = app.NormalizeSpecialCharacters(shortName)
+    end
+    return guildNote, shortName, string.lower(shortName) ~= string.lower(guildNote)
+end
+
 -- Gets the guild note for a player by looping over the number of guild members
 function app.FindGuildNoteForPlayer(nameWithRealm, useOfficerNote)
     for i = 1, GetNumGuildMembers() do
@@ -182,31 +191,44 @@ function app.FindGuildNoteForPlayer(nameWithRealm, useOfficerNote)
     end
 end
 
+-- Formats the message with the guild note
+function app.FormatMessageWithGuildNote(msg, author, guildNote)
+    local textColor = CreateColor(GuildNoteDisplayDB.note_colour_table.r, GuildNoteDisplayDB.note_colour_table.g, GuildNoteDisplayDB.note_colour_table.b, GuildNoteDisplayDB.note_colour_table.a)
+    if not GuildNoteDisplayDB["note_in_author_field"] then
+        if GuildNoteDisplayDB["colour_guild_note"] then
+            msg = "|c" .. textColor:GenerateHexColor() .. "(" .. guildNote .. ")|r " .. msg
+        else
+            msg = "(" .. guildNote .. ") " .. msg
+        end
+    else
+        author = Ambiguate(author, "guild") .. " (" .. guildNote .. ")"
+    end
+    return msg, author
+end
+
 -- Adds the guild note to the guild chat
 function app.AddGuildNoteToGuildChat(self, event, msg, author, ...)
     if event == "CHAT_MSG_GUILD" or event == "CHAT_MSG_OFFICER" then
         local guildNote = app.FindGuildNoteForPlayer(author, GuildNoteDisplayDB["use_officer_note"])
         local shortName = Ambiguate(author, "short")
-		local guildNoteForCompare = guildNote
-		local shortNameForCompare = shortName
+        local guildNoteForCompare, shortNameForCompare, isDifferent = app.NormalizeAndCompare(guildNote, shortName)
 
-		if GuildNoteDisplayDB["normalise_special_characters"] then
-			guildNoteForCompare = app.NormalizeSpecialCharacters(guildNote)
-			shortNameForCompare = app.NormalizeSpecialCharacters(shortName)
-		end
+        if guildNote and guildNote ~= "" and isDifferent then
+            msg, author = app.FormatMessageWithGuildNote(msg, author, guildNote)
+        end
+        return false, msg, author, ...
+    end
+end
 
-        if guildNote and guildNote ~= "" and string.lower(shortNameForCompare) ~= string.lower(guildNoteForCompare) then
-            local textColor = CreateColor(GuildNoteDisplayDB.note_colour_table.r, GuildNoteDisplayDB.note_colour_table.g, GuildNoteDisplayDB.note_colour_table.b, GuildNoteDisplayDB.note_colour_table.a);
-			if not GuildNoteDisplayDB["note_in_author_field"] then
-				if GuildNoteDisplayDB["colour_guild_note"] then
-					msg = "|c" .. textColor:GenerateHexColor() .. "(" .. guildNote .. ")|r " .. msg
-				else
-					msg = "(" .. guildNote .. ") " .. msg				
-				end				
-			else
-				 -- INFO: Author is in the format of name-realm but in guild this would normally show as name only when on the same realm so we need to ambiguate it
-            	author = Ambiguate(author, "guild") .. " (" .. guildNote .. ")"
-			end          
+-- Adds the guild note to the party and raid chat
+function app.AddGuildNoteToPartyRaidChat(self, event, msg, author, ...)
+    if GuildNoteDisplayDB["display_party_raid_chat"] and (event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_PARTY_LEADER" or event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER") then
+        local guildNote = app.FindGuildNoteForPlayer(author, GuildNoteDisplayDB["use_officer_note"])
+        local shortName = Ambiguate(author, "short")
+        local guildNoteForCompare, shortNameForCompare, isDifferent = app.NormalizeAndCompare(guildNote, shortName)
+
+        if guildNote and guildNote ~= "" and isDifferent then
+            msg, author = app.FormatMessageWithGuildNote(msg, author, guildNote)
         end
         return false, msg, author, ...
     end
@@ -231,56 +253,17 @@ function app.AddGuildNoteToLoginLogoutMessage(self, event, msg, ...)
 
 			local guildNote = app.FindGuildNoteForPlayer(author, GuildNoteDisplayDB["use_officer_note"])
 			local shortName = Ambiguate(author, "short")
-			local guildNoteForCompare = guildNote
-			local shortNameForCompare = shortName
+			local guildNoteForCompare, shortNameForCompare, isDifferent = app.NormalizeAndCompare(guildNote, shortName)
 
-			if GuildNoteDisplayDB["normalise_special_characters"] then
-				guildNoteForCompare = app.NormalizeSpecialCharacters(guildNote)
-				shortNameForCompare = app.NormalizeSpecialCharacters(shortName)
-			end
-
-			if guildNote and guildNote ~= "" and string.lower(shortNameForCompare) ~= string.lower(guildNoteForCompare) then
-				local textColor = CreateColor(GuildNoteDisplayDB.note_colour_table.r, GuildNoteDisplayDB.note_colour_table.g, GuildNoteDisplayDB.note_colour_table.b, GuildNoteDisplayDB.note_colour_table.a);
-				if GuildNoteDisplayDB["colour_guild_note"] then
-					msg = "|c" .. textColor:GenerateHexColor() .. "(" .. guildNote .. ")|r " .. msg
-				else
-					msg = "(" .. guildNote .. ") " .. msg				
-				end			        
+			if guildNote and guildNote ~= "" and isDifferent then
+				msg = app.FormatMessageWithGuildNote(msg, author, guildNote)
 			end
 			return false, msg, ...
 		end
     end
 end
 
--- Adds the guild note to the party chat
-function app.AddGuildNoteToPartyRaidChat(self, event, msg, author, ...)
-    if GuildNoteDisplayDB["display_party_raid_chat"] and (event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_PARTY_LEADER" or event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER") then
-        local guildNote = app.FindGuildNoteForPlayer(author, GuildNoteDisplayDB["use_officer_note"])
-        local shortName = Ambiguate(author, "short")
-        local guildNoteForCompare = guildNote
-        local shortNameForCompare = shortName
-
-        if GuildNoteDisplayDB["normalise_special_characters"] then
-            guildNoteForCompare = app.NormalizeSpecialCharacters(guildNote)
-            shortNameForCompare = app.NormalizeSpecialCharacters(shortName)
-        end
-
-        if guildNote and guildNote ~= "" and string.lower(shortNameForCompare) ~= string.lower(guildNoteForCompare) then
-            local textColor = CreateColor(GuildNoteDisplayDB.note_colour_table.r, GuildNoteDisplayDB.note_colour_table.g, GuildNoteDisplayDB.note_colour_table.b, GuildNoteDisplayDB.note_colour_table.a)
-            if not GuildNoteDisplayDB["note_in_author_field"] then
-                if GuildNoteDisplayDB["colour_guild_note"] then
-                    msg = "|c" .. textColor:GenerateHexColor() .. "(" .. guildNote .. ")|r " .. msg
-                else
-                    msg = "(" .. guildNote .. ") " .. msg
-                end
-            else
-                author = Ambiguate(author, "party") .. " (" .. guildNote .. ")"
-            end
-        end
-        return false, msg, author, ...
-    end
-end
-
+-- Add message event filters
 function app.AddMessageEventFilters()
 	-- Add the event filter for the guild chat messages
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", app.AddGuildNoteToGuildChat)
