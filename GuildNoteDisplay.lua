@@ -44,6 +44,10 @@ function app.Initialise()
 	if GuildNoteDisplayDB["use_officer_note"] == nil then 
 		GuildNoteDisplayDB["use_officer_note"] = false
 	end
+
+	if GuildNoteDisplayDB["display_party_raid_chat"] == nil then 
+		GuildNoteDisplayDB["display_party_raid_chat"] = true
+	end
 end
 
 -- Addon is loaded
@@ -51,6 +55,7 @@ function event:ADDON_LOADED(addOnName, containsBindings)
 	if addOnName == appName then
         app.Initialise()
         app.Settings()
+		app.AddMessageEventFilters()
     end
 end
 
@@ -179,7 +184,7 @@ end
 
 -- Adds the guild note to the guild chat
 function app.AddGuildNoteToGuildChat(self, event, msg, author, ...)
-    if event == "CHAT_MSG_GUILD" then
+    if event == "CHAT_MSG_GUILD" or event == "CHAT_MSG_OFFICER" then
         local guildNote = app.FindGuildNoteForPlayer(author, GuildNoteDisplayDB["use_officer_note"])
         local shortName = Ambiguate(author, "short")
 		local guildNoteForCompare = guildNote
@@ -247,9 +252,47 @@ function app.AddGuildNoteToLoginLogoutMessage(self, event, msg, ...)
     end
 end
 
--- Add the event filter
-ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", app.AddGuildNoteToGuildChat)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", app.AddGuildNoteToLoginLogoutMessage)
+-- Adds the guild note to the party chat
+function app.AddGuildNoteToPartyRaidChat(self, event, msg, author, ...)
+    if GuildNoteDisplayDB["display_party_raid_chat"] and (event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_PARTY_LEADER" or event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER") then
+        local guildNote = app.FindGuildNoteForPlayer(author, GuildNoteDisplayDB["use_officer_note"])
+        local shortName = Ambiguate(author, "short")
+        local guildNoteForCompare = guildNote
+        local shortNameForCompare = shortName
+
+        if GuildNoteDisplayDB["normalise_special_characters"] then
+            guildNoteForCompare = app.NormalizeSpecialCharacters(guildNote)
+            shortNameForCompare = app.NormalizeSpecialCharacters(shortName)
+        end
+
+        if guildNote and guildNote ~= "" and string.lower(shortNameForCompare) ~= string.lower(guildNoteForCompare) then
+            local textColor = CreateColor(GuildNoteDisplayDB.note_colour_table.r, GuildNoteDisplayDB.note_colour_table.g, GuildNoteDisplayDB.note_colour_table.b, GuildNoteDisplayDB.note_colour_table.a)
+            if not GuildNoteDisplayDB["note_in_author_field"] then
+                if GuildNoteDisplayDB["colour_guild_note"] then
+                    msg = "|c" .. textColor:GenerateHexColor() .. "(" .. guildNote .. ")|r " .. msg
+                else
+                    msg = "(" .. guildNote .. ") " .. msg
+                end
+            else
+                author = Ambiguate(author, "party") .. " (" .. guildNote .. ")"
+            end
+        end
+        return false, msg, author, ...
+    end
+end
+
+function app.AddMessageEventFilters()
+	-- Add the event filter for the guild chat messages
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", app.AddGuildNoteToGuildChat)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_OFFICER", app.AddGuildNoteToGuildChat)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", app.AddGuildNoteToLoginLogoutMessage)
+	if GuildNoteDisplayDB["display_party_raid_chat"] ~= nil and GuildNoteDisplayDB["display_party_raid_chat"] then
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY", app.AddGuildNoteToPartyRaidChat)
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY_LEADER", app.AddGuildNoteToPartyRaidChat)
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID", app.AddGuildNoteToPartyRaidChat)
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_LEADER", app.AddGuildNoteToPartyRaidChat)
+	end
+end
 
 -- Settings
 function app.Settings()
@@ -326,6 +369,16 @@ function app.Settings()
 		local name = "Use the officer note"
 		local tooltip = "Use the officer note rather than the public note for the guild note display. |cFFFF0000Must be able to see officer notes for this setting to work correctly!|r"
 		local defaultValue = false
+
+		local setting = RegisterSetting(variable, defaultValue, name)
+		CreateCheckbox(category, setting, tooltip)
+	end
+
+	do -- checkbox
+		local variable = "display_party_raid_chat"
+		local name = "Display in party and raid chat"
+		local tooltip = "Display the guild note in party and raid chat. This will obviously only work for characters that you share a guild with."
+		local defaultValue = true
 
 		local setting = RegisterSetting(variable, defaultValue, name)
 		CreateCheckbox(category, setting, tooltip)
