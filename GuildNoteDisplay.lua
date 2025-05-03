@@ -176,7 +176,7 @@ function app.NormalizeAndCompare(guildNote, shortName)
         guildNote = app.NormalizeSpecialCharacters(guildNote)
         shortName = app.NormalizeSpecialCharacters(shortName)
     end
-    return guildNote, shortName, string.lower(shortName) ~= string.lower(guildNote)
+	return guildNote, shortName, guildNote and string.lower(shortName) ~= string.lower(guildNote)
 end
 
 -- Gets the guild note for a player by looping over the number of guild members
