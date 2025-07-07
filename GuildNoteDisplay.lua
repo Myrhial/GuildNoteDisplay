@@ -97,6 +97,13 @@ function GuildNoteDisplay_Click(self, button)
     app.OpenSettings()
 end
 
+-- Slash command to open settings
+SLASH_GUILDNOTEDISPLAY1 = "/gnd";
+SLASH_GUILDNOTEDISPLAY2 = "/guildnotedisplay";
+SlashCmdList["GUILDNOTEDISPLAY"] = function(msg)
+	app.OpenSettings()
+end
+
 -- Normalize special characters
 function app.NormalizeSpecialCharacters(str)
 	local substitutes = {}
