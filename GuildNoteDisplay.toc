@@ -3,7 +3,18 @@
 ## X-Curse-Project-ID: 1134192
 ## X-Wago-ID: jK8XqXKy
 ## Title: Guild Note Display
-## Notes: An addon that shows guild members' notes when they chat or log in/out.
+## Notes-enUS: An addon that shows guild members' notes when they chat or log in/out.
+## Notes-deDE: Ein Addon, das die Gildennotizen der Mitglieder anzeigt, wenn sie chatten oder sich ein-/ausloggen.
+## Notes-esES: Un complemento que muestra las notas de los miembros de la hermandad cuando chatean o inician/cerran sesión.
+## Notes-esMX: Un complemento que muestra las notas de los miembros de la hermandad cuando chatean o inician/cerran sesión.
+## Notes-frFR: Un addon qui affiche les notes des membres de la guilde lorsqu'ils discutent ou se connectent/déconnectent.
+## Notes-itIT: Un addon che mostra le note dei membri della gilda quando chattano o si connettono/disconnettono.
+## Notes-koKR: 길드원이 채팅하거나 로그인/로그아웃할 때 길드원의 메모를 표시하는 애드온입니다.
+## Notes-ptBR: Um addon que exibe as notas dos membros da guilda quando eles conversam ou fazem login/saem.
+## Notes-ruRU: Дополнение, которое показывает заметки участников гильдии, когда они общаются или входят/выходят из системы.
+## Notes-zhCN: 一个在公会成员聊天或登录/登出时显示他们备注的插件。
+## Notes-zhTW: 一個在公會成員聊天或登入/登出時顯示他們備註的插件。
+
 ## Author: Myrhial
 ## SavedVariables: GuildNoteDisplayDB
 ## AddonCompartmentFunc: GuildNoteDisplay_Click
@@ -23,3 +34,13 @@
 ## Category-zhTW: 對話
 
 GuildNoteDisplay.lua
+Localization\Localization.core.lua
+Localization\Localization.de.lua
+Localization\Localization.en.lua
+Localization\Localization.fr.lua
+Localization\Localization.es.lua
+Localization\Localization.it.lua
+Localization\Localization.ko.lua
+Localization\Localization.pt.lua
+Localization\Localization.ru.lua
+Localization\Localization.zh.lua

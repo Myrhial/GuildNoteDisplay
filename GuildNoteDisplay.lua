@@ -1,9 +1,11 @@
 -- Initialisation
 local appName, app = ...    -- App name and app table
+app.L = app.L or {} -- Localisation table
+local L = app.L;	-- Localisation table
 app.api = {}    -- Api table for our app
 GuildNoteDisplay = app.api  -- Api namespace
 local api = app.api -- Api prefix for easier access
-app.Name = "Guild Note Display"
+app.Name = "Guild Note Display"	-- Do not localize
 
 -- Event registration
 local event = CreateFrame("Frame")
@@ -317,8 +319,8 @@ function app.Settings()
 
 	do -- checkbox
 		local variable = "colour_guild_note"
-		local name = "Colour guild note"
-		local tooltip = "Apply the colour chosen with the 'guild note colour' setting to the guild note in the chat messages"
+		local name = L["Colour guild note"]
+		local tooltip = L["Colour guild note tooltip"]
 		local defaultValue = true
 
 		local setting = RegisterSetting(variable, defaultValue, name)
@@ -330,14 +332,14 @@ function app.Settings()
             app.ShowColorPicker(GuildNoteDisplayDB.note_colour_table)
         end
 
-        local initializer = CreateSettingsButtonInitializer("Guild note colour", "Click to pick a colour", OnButtonClick, nil, true);
+        local initializer = CreateSettingsButtonInitializer(L["Guild note colour"], L["Click to pick a colour"], OnButtonClick, nil, true);
         layout:AddInitializer(initializer)
     end
 
 	do -- checkbox
 		local variable = "note_in_author_field"
-		local name = "Note in name field"
-		local tooltip = "This will show the note in brackets after the character name, rather than at the start of the message.|n|n|cFFFF0000Important warning: If you click the name of the character to whisper, the note will be placed in the whisper. This is an annoying side effect I cannot work around, and why this option is not the default. By using this option, you agree to live with this side effect.|r"
+		local name = L["Note in name field"]
+		local tooltip = L["Note in name field tooltip"]
 		local defaultValue = false
 
 		local setting = RegisterSetting(variable, defaultValue, name)
@@ -346,8 +348,8 @@ function app.Settings()
 
 	do -- checkbox
 		local variable = "normalise_special_characters"
-		local name = "Normalise special characters"
-		local tooltip = "When comparing names, normalise special characters like accents to their base characters. This is useful if your guild uses special characters in names, but you want to compare them to the normal characters. Normalisation will be applied to both the guild note and the character name."
+		local name = L["Normalise special characters"]
+		local tooltip = L["Normalise special characters tooltip"]
 		local defaultValue = false
 
 		local setting = RegisterSetting(variable, defaultValue, name)
@@ -356,8 +358,8 @@ function app.Settings()
 
 	do -- checkbox
 		local variable = "use_officer_note"
-		local name = "Use the officer note"
-		local tooltip = "Use the officer note rather than the public note for the guild note display. |cFFFF0000Must be able to see officer notes for this setting to work correctly!|r"
+		local name = L["Use the officer note"]
+		local tooltip = L["Use the officer note tooltip"]
 		local defaultValue = false
 
 		local setting = RegisterSetting(variable, defaultValue, name)
@@ -366,8 +368,8 @@ function app.Settings()
 
 	do -- checkbox
 		local variable = "display_party_raid_chat"
-		local name = "Display in party and raid chat"
-		local tooltip = "Display the guild note in party and raid chat. This will obviously only work for characters that you share a guild with."
+		local name = L["Display in party and raid chat"]
+		local tooltip = L["Display in party and raid chat tooltip"]
 		local defaultValue = true
 
 		local setting = RegisterSetting(variable, defaultValue, name)
