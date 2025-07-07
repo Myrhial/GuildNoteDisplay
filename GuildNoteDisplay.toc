@@ -1,9 +1,9 @@
-## Interface: 110100, 110105
+## Interface: 110107
 ## Version: @project-version@
 ## X-Curse-Project-ID: 1134192
 ## X-Wago-ID: jK8XqXKy
 ## Title: Guild Note Display
-## Notes: A simple addon that displays the guild note of a character when they talk in guild chat.
+## Notes: An addon that shows guild members' notes when they chat or log in/out.
 ## Author: Myrhial
 ## SavedVariables: GuildNoteDisplayDB
 ## AddonCompartmentFunc: GuildNoteDisplay_Click
