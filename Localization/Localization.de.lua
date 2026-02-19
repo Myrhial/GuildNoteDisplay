@@ -13,4 +13,6 @@ if GetLocale() == "deDE" then
     L["Use the officer note tooltip"] = "Verwenden Sie die Offiziersnotiz anstelle der öffentlichen Notiz für die Anzeige der Gildennotiz. |cFFFF0000Muss in der Lage sein, Offiziersnotizen zu sehen, damit diese Einstellung korrekt funktioniert!|r";
     L["Display in party and raid chat tooltip"] = "Zeigt die Gildennotiz im Gruppen- und Schlachtzugs-Chat an. Dies funktioniert offensichtlich nur für Charaktere, mit denen Sie eine Gilde teilen.";
     L["Normalise special characters tooltip"] = "Bei der Namensvergleichung werden Sonderzeichen wie Akzente auf ihre Basiszeichen normalisiert. Dies kann helfen, Namen zuzuordnen, die unterschiedliche Schreibweisen oder diakritische Zeichen aufweisen.";
+    L["Hide minimap icon"] = "Minikarten-Symbol ausblenden";
+    L["Hide minimap icon tooltip"] = "Blendet das Minikartensymbol für dieses Addon aus. Sie können die Einstellungen weiterhin aufrufen, indem Sie /gnd eingeben oder das Addon-Fach verwenden.";
 end

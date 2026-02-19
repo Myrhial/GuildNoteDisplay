@@ -13,4 +13,6 @@ if GetLocale() == "enUS" then
     L["Use the officer note tooltip"] = "Use the officer note rather than the public note for the guild note display. |cFFFF0000Must be able to see officer notes for this setting to work correctly!|r";
     L["Display in party and raid chat tooltip"] = "Display the guild note in party and raid chat. This will obviously only work for characters that you share a guild with.";
     L["Normalise special characters tooltip"] = "When comparing names, normalise special characters like accents to their base characters. This can help with matching names that may have different spellings or diacritics.";
+    L["Hide minimap icon"] = "Hide minimap icon";
+    L["Hide minimap icon tooltip"] = "Hide the minimap icon for this addon. You can still access the settings by typing /gnd or by using the addon compartment.";
 end

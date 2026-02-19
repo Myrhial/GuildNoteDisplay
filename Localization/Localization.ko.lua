@@ -13,4 +13,6 @@ if GetLocale() == "koKR" then
     L["Use the officer note tooltip"] = "길드 메모 표시를 위해 공개 메모 대신 임원 메모를 사용합니다. |cFFFF0000이 설정이 올바르게 작동하려면 임원 메모를 볼 수 있어야 합니다!|r";
     L["Display in party and raid chat tooltip"] = "파티 및 공격대 채팅에 길드 메모를 표시합니다. 이것은 당신이 길드를 공유하는 캐릭터에 대해서만 작동합니다.";
     L["Normalise special characters tooltip"] = "이름을 비교할 때, 악센트와 같은 특수 문자를 기본 문자로 정규화합니다. 이는 서로 다른 철자나 발음 기호가 있는 이름을 일치시키는 데 도움이 될 수 있습니다.";
+    L["Hide minimap icon"] = "미니맵 아이콘 숨기기";
+    L["Hide minimap icon tooltip"] = "이 애드온의 미니맵 아이콘을 숨깁니다. /gnd를 입력하거나 애드온 구획을 사용하여 설정에 여전히 액세스할 수 있습니다.";
 end

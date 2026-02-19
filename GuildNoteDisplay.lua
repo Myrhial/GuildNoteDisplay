@@ -50,6 +50,26 @@ function app.Initialise()
 	if GuildNoteDisplayDB["display_party_raid_chat"] == nil then 
 		GuildNoteDisplayDB["display_party_raid_chat"] = true
 	end
+
+	if GuildNoteDisplayDB["hide"] == nil then 
+		GuildNoteDisplayDB["hide"] = false
+	end
+end
+
+-- Minimap icon
+function app.MinimapIcon()
+	local LDB = LibStub("LibDataBroker-1.1")
+	local icon = LDB:NewDataObject(appName, {
+		type = "data source",
+		text = app.Name,
+		icon = "Interface\\AddOns\\GuildNoteDisplay\\GuildNoteDisplay.blp",
+		OnClick = function() 
+			app.OpenSettings()
+		end,
+	})
+
+	app.MinimapIcon = LibStub("LibDBIcon-1.0")
+	app.MinimapIcon:Register(appName, icon, GuildNoteDisplayDB)
 end
 
 -- Addon is loaded
@@ -57,6 +77,7 @@ function event:ADDON_LOADED(addOnName, containsBindings)
 	if addOnName == appName then
         app.Initialise()
         app.Settings()
+		app.MinimapIcon()
 		app.AddMessageEventFilters()
     end
 end
@@ -374,5 +395,22 @@ function app.Settings()
 
 		local setting = RegisterSetting(variable, defaultValue, name)
 		CreateCheckbox(category, setting, tooltip)
+	end
+
+	do -- checkbox
+		local variable = "hide"
+		local name = L["Hide minimap icon"]
+		local tooltip = L["Hide minimap icon tooltip"]
+		local defaultValue = false
+
+		local setting = RegisterSetting(variable, defaultValue, name)
+		CreateCheckbox(category, setting, tooltip)
+		setting:SetValueChangedCallback(function()
+			if GuildNoteDisplayDB["hide"] == false then
+				app.MinimapIcon:Show(appName)
+			else
+				app.MinimapIcon:Hide(appName)
+			end
+		end)
 	end
 end

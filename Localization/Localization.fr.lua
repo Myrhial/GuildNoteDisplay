@@ -13,4 +13,6 @@ if GetLocale() == "frFR" then
     L["Use the officer note tooltip"] = "Utilisez la note d'officier plutôt que la note publique pour l'affichage de la note de guilde. |cFFFF0000Vous devez être en mesure de voir les notes d'officier pour que ce paramètre fonctionne correctement !|r";
     L["Display in party and raid chat tooltip"] = "Affichez la note de guilde dans le chat de groupe et de raid. Cela ne fonctionnera évidemment que pour les personnages avec lesquels vous partagez une guilde.";
     L["Normalise special characters tooltip"] = "Lors de la comparaison des noms, normalisez les caractères spéciaux comme les accents sur leurs caractères de base. Cela peut aider à faire correspondre des noms qui peuvent avoir des orthographes ou des diacritiques différents.";
+    L["Hide minimap icon"] = "Masquer l'icône de la minicarte";
+    L["Hide minimap icon tooltip"] = "Masquez l'icône de la minicarte pour cet addon. Vous pouvez toujours accéder aux paramètres en tapant /gnd ou en utilisant le compartiment d'addon.";
 end

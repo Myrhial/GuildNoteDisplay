@@ -13,4 +13,6 @@ if GetLocale() == "zhCN" then
     L["Use the officer note tooltip"] = "使用官员备注而不是公共备注来显示公会备注。|cFFFF0000必须能够查看官员备注才能使此设置正常工作！|r";
     L["Display in party and raid chat tooltip"] = "在队伍和团队聊天中显示公会备注。这显然只适用于您与之共享公会的角色。";
     L["Normalise special characters tooltip"] = "在比较名称时，将特殊字符（如重音符号）规范化为其基本字符。这可以帮助匹配可能具有不同拼写或变音符号的名称。";
+    L["Hide minimap icon"] = "隐藏小地图图标";
+    L["Hide minimap icon tooltip"] = "隐藏此插件的小地图图标。您仍然可以通过输入/gnd或使用插件区来访问设置。";
 end

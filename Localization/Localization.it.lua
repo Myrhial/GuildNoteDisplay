@@ -13,4 +13,6 @@ if GetLocale() == "itIT" then
     L["Use the officer note tooltip"] = "Usa la nota dell'ufficiale piuttosto che la nota pubblica per la visualizzazione della nota di gilda. |cFFFF0000Devi essere in grado di vedere le note dell'ufficiale affinché questa impostazione funzioni correttamente!|r";
     L["Display in party and raid chat tooltip"] = "Mostra la nota di gilda nella chat di gruppo e raid. Questo funzionerà ovviamente solo per i personaggi con cui condividi una gilda.";
     L["Normalise special characters tooltip"] = "Quando si confrontano i nomi, normalizza i caratteri speciali come gli accenti sui loro caratteri di base. Questo può aiutare a far corrispondere nomi che possono avere diverse ortografie o diacritici.";
+    L["Hide minimap icon"] = "Nascondi icona minimappa";
+    L["Hide minimap icon tooltip"] = "Nascondi l'icona della minimappa per questo addon. Puoi comunque accedere alle impostazioni digitando /gnd o utilizzando il compartimento degli addon.";
 end
