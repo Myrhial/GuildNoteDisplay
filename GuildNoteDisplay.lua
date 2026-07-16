@@ -129,6 +129,10 @@ end
 
 -- Normalize special characters
 function app.NormalizeSpecialCharacters(str)
+	if str == nil then
+		return ""
+	end
+	
 	local substitutes = {}
 	substitutes["À"] = "A"
 	substitutes["Á"] = "A"
@@ -193,15 +197,17 @@ function app.NormalizeSpecialCharacters(str)
 	substitutes["þ"] = "p"
 	substitutes["ÿ"] = "y"
 
-	local normalisedString = ''
-
-	local normalisedString = str: gsub("[%z\1-\127\194-\244][\128-\191]*", substitutes)
+	local normalisedString = str:gsub("[%z\1-\127\194-\244][\128-\191]*", substitutes)
 
 	return normalisedString
 end  
 
 -- Normalises the guild note and compares it to the short name
 function app.NormalizeAndCompare(guildNote, shortName)
+	if guildNote == nil or shortName == nil then
+		return nil, nil, false
+	end
+	
     if GuildNoteDisplayDB["normalise_special_characters"] then
         guildNote = app.NormalizeSpecialCharacters(guildNote)
         shortName = app.NormalizeSpecialCharacters(shortName)
