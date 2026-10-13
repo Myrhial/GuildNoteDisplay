@@ -313,6 +313,22 @@ function app.AddMessageEventFilters()
 	end
 end
 
+-- Hyperlink handling
+--function app.AddTooltipToCharacterName()
+    ChatFrame1:HookScript("OnHyperlinkEnter", function(_, hyperlink)
+        local name = hyperlink:match(":(.-):")
+        if app.FindGuildNoteForPlayer(name, GuildNoteDisplayDB["use_officer_note"]) then
+            GameTooltip:SetOwner(ChatFrame1:GetParent(), "ANCHOR_CURSOR_LEFT")
+            GameTooltip:ClearLines()
+            GameTooltip:AddLine(app.FindGuildNoteForPlayer(name), GuildNoteDisplayDB["use_officer_note"])
+            GameTooltip:Show()
+        end
+    end)
+    ChatFrame1:HookScript("OnHyperlinkLeave", function()
+        GameTooltip:Hide()
+    end)
+--end
+
 -- Settings
 function app.Settings()
 	-- Settings page
