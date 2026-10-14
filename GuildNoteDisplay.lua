@@ -79,6 +79,7 @@ function event:ADDON_LOADED(addOnName, containsBindings)
         app.Settings()
 		app.MinimapIcon()
 		app.AddMessageEventFilters()
+		app.AddTooltipToCharacterName()
     end
 end
 
@@ -313,21 +314,29 @@ function app.AddMessageEventFilters()
 	end
 end
 
--- Hyperlink handling
---function app.AddTooltipToCharacterName()
-    ChatFrame1:HookScript("OnHyperlinkEnter", function(_, hyperlink)
-        local name = hyperlink:match(":(.-):")
-        if app.FindGuildNoteForPlayer(name, GuildNoteDisplayDB["use_officer_note"]) then
-            GameTooltip:SetOwner(ChatFrame1:GetParent(), "ANCHOR_CURSOR_LEFT")
-            GameTooltip:ClearLines()
-            GameTooltip:AddLine(app.FindGuildNoteForPlayer(name), GuildNoteDisplayDB["use_officer_note"])
-            GameTooltip:Show()
-        end
-    end)
-    ChatFrame1:HookScript("OnHyperlinkLeave", function()
-        GameTooltip:Hide()
-    end)
---end
+-- Hyperlink handling, inspired by how Chattynator (plusmouse) handles it
+function app.AddTooltipToCharacterName()
+	-- Loop through every chat frame so they can all be set up for character name tooltips
+	for i = 1, NUM_CHAT_WINDOWS do
+		if i ~= 2 then --Skip ChatFrame2, which is always Combat Log
+			_G["ChatFrame"..i]:HookScript("OnHyperlinkEnter", function(_, hyperlink)
+				local name = hyperlink:sub(8)
+				if strfind(name, ":") then
+					name = name:sub(1, strfind(name, ":") - 1)
+				end
+				if app.FindGuildNoteForPlayer(name, GuildNoteDisplayDB["use_officer_note"]) then
+					GameTooltip:SetOwner(_G["ChatFrame"..i]:GetParent(), "ANCHOR_CURSOR_LEFT")
+					GameTooltip:ClearLines()
+					GameTooltip:AddLine(app.FindGuildNoteForPlayer(name), GuildNoteDisplayDB["use_officer_note"])
+					GameTooltip:Show()
+				end
+			end)
+			_G["ChatFrame"..i]:HookScript("OnHyperlinkLeave", function()
+				GameTooltip:Hide()
+			end)
+		end
+	end
+end
 
 -- Settings
 function app.Settings()
