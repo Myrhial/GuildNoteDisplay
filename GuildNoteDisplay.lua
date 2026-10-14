@@ -27,9 +27,6 @@ function app.Initialise()
 		GuildNoteDisplayDB["colour_guild_note"] = true
 	end
 
-	-- Yell at me if I forget to remove this
-	GuildNoteDisplayDB["note_in_tooltip"] = true
-
 	if GuildNoteDisplayDB["note_colour_table"] == nil then
         GuildNoteDisplayDB["note_colour_table"] = {
 			r=1,
@@ -398,6 +395,16 @@ function app.Settings()
 		local variable = "note_in_author_field"
 		local name = L["Note in name field"]
 		local tooltip = L["Note in name field tooltip"]
+		local defaultValue = false
+
+		local setting = RegisterSetting(variable, defaultValue, name)
+		CreateCheckbox(category, setting, tooltip)
+	end
+
+	do --checkbox
+		local variable = "note_in_tooltip"
+		local name = L["Note in tooltip"]
+		local tooltip = L["Note in tooltip tooltip"]
 		local defaultValue = false
 
 		local setting = RegisterSetting(variable, defaultValue, name)
