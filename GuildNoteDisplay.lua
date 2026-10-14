@@ -27,6 +27,9 @@ function app.Initialise()
 		GuildNoteDisplayDB["colour_guild_note"] = true
 	end
 
+	-- Yell at me if I forget to remove this
+	GuildNoteDisplayDB["note_in_tooltip"] = true
+
 	if GuildNoteDisplayDB["note_colour_table"] == nil then
         GuildNoteDisplayDB["note_colour_table"] = {
 			r=1,
@@ -231,14 +234,17 @@ end
 -- Formats the message with the guild note
 function app.FormatMessageWithGuildNote(msg, author, guildNote)
     local textColor = CreateColor(GuildNoteDisplayDB.note_colour_table.r, GuildNoteDisplayDB.note_colour_table.g, GuildNoteDisplayDB.note_colour_table.b, GuildNoteDisplayDB.note_colour_table.a)
-    if not GuildNoteDisplayDB["note_in_author_field"] then
-        if GuildNoteDisplayDB["colour_guild_note"] then
-            msg = "|c" .. textColor:GenerateHexColor() .. "(" .. guildNote .. ")|r " .. msg
+    
+    if not GuildNoteDisplayDB["note_in_tooltip"] then
+        if not GuildNoteDisplayDB["note_in_author_field"] then
+            if GuildNoteDisplayDB["colour_guild_note"] then
+                msg = "|c" .. textColor:GenerateHexColor() .. "(" .. guildNote .. ")|r " .. msg
+            else
+                msg = "(" .. guildNote .. ") " .. msg
+            end
         else
-            msg = "(" .. guildNote .. ") " .. msg
+            author = Ambiguate(author, "guild") .. " (" .. guildNote .. ")"
         end
-    else
-        author = Ambiguate(author, "guild") .. " (" .. guildNote .. ")"
     end
     return msg, author
 end
@@ -324,7 +330,7 @@ function app.AddTooltipToCharacterName()
 				if strfind(name, ":") then
 					name = name:sub(1, strfind(name, ":") - 1)
 				end
-				if app.FindGuildNoteForPlayer(name, GuildNoteDisplayDB["use_officer_note"]) then
+				if app.FindGuildNoteForPlayer(name, GuildNoteDisplayDB["use_officer_note"]) and GuildNoteDisplayDB["note_in_tooltip"] then
 					GameTooltip:SetOwner(_G["ChatFrame"..i]:GetParent(), "ANCHOR_CURSOR_LEFT")
 					GameTooltip:ClearLines()
 					GameTooltip:AddLine(app.FindGuildNoteForPlayer(name), GuildNoteDisplayDB["use_officer_note"])
