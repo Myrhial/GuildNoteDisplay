@@ -21,13 +21,13 @@ event:RegisterEvent("CHAT_MSG_SYSTEM")
 function app.Initialise()
 	-- Declare SavedVariables
 	if not GuildNoteDisplayDB then GuildNoteDisplayDB = {} end
-	
+
 	-- Enable default user settings
-	if GuildNoteDisplayDB["colour_guild_note"] == nil then 
+	if GuildNoteDisplayDB["colour_guild_note"] == nil then
 		GuildNoteDisplayDB["colour_guild_note"] = true
 	end
 
-	if GuildNoteDisplayDB["note_colour_table"] == nil then 
+	if GuildNoteDisplayDB["note_colour_table"] == nil then
         GuildNoteDisplayDB["note_colour_table"] = {
 			r=1,
 			g=1,
@@ -35,23 +35,23 @@ function app.Initialise()
 		}
     end
 
-	if GuildNoteDisplayDB["note_in_author_field"] == nil then 
+	if GuildNoteDisplayDB["note_in_author_field"] == nil then
 		GuildNoteDisplayDB["note_in_author_field"] = false
 	end
 
-	if GuildNoteDisplayDB["normalise_special_characters"] == nil then 
+	if GuildNoteDisplayDB["normalise_special_characters"] == nil then
 		GuildNoteDisplayDB["normalise_special_characters"] = false
 	end
 
-	if GuildNoteDisplayDB["use_officer_note"] == nil then 
+	if GuildNoteDisplayDB["use_officer_note"] == nil then
 		GuildNoteDisplayDB["use_officer_note"] = false
 	end
 
-	if GuildNoteDisplayDB["display_party_raid_chat"] == nil then 
+	if GuildNoteDisplayDB["display_party_raid_chat"] == nil then
 		GuildNoteDisplayDB["display_party_raid_chat"] = true
 	end
 
-	if GuildNoteDisplayDB["hide"] == nil then 
+	if GuildNoteDisplayDB["hide"] == nil then
 		GuildNoteDisplayDB["hide"] = false
 	end
 end
@@ -63,7 +63,7 @@ function app.MinimapIcon()
 		type = "data source",
 		text = app.Name,
 		icon = "Interface\\AddOns\\GuildNoteDisplay\\GuildNoteDisplay.blp",
-		OnClick = function() 
+		OnClick = function()
 			app.OpenSettings()
 		end,
 	})
@@ -132,7 +132,7 @@ function app.NormalizeSpecialCharacters(str)
 	if str == nil then
 		return ""
 	end
-	
+
 	local substitutes = {}
 	substitutes["À"] = "A"
 	substitutes["Á"] = "A"
@@ -200,14 +200,14 @@ function app.NormalizeSpecialCharacters(str)
 	local normalisedString = str:gsub("[%z\1-\127\194-\244][\128-\191]*", substitutes)
 
 	return normalisedString
-end  
+end
 
 -- Normalises the guild note and compares it to the short name
 function app.NormalizeAndCompare(guildNote, shortName)
 	if guildNote == nil or shortName == nil then
 		return nil, nil, false
 	end
-	
+
     if GuildNoteDisplayDB["normalise_special_characters"] then
         guildNote = app.NormalizeSpecialCharacters(guildNote)
         shortName = app.NormalizeSpecialCharacters(shortName)
@@ -222,7 +222,7 @@ function app.FindGuildNoteForPlayer(nameWithRealm, useOfficerNote)
         if name == nameWithRealm and not useOfficerNote then
             return publicNote
 		elseif name == nameWithRealm and useOfficerNote then
-			return officerNote 
+			return officerNote
         end
     end
 end
