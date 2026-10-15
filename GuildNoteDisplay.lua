@@ -79,6 +79,7 @@ function event:ADDON_LOADED(addOnName, containsBindings)
         app.Settings()
 		app.MinimapIcon()
 		app.AddMessageEventFilters()
+		app.AddTooltipToCharacterName()
     end
 end
 
@@ -230,14 +231,17 @@ end
 -- Formats the message with the guild note
 function app.FormatMessageWithGuildNote(msg, author, guildNote)
     local textColor = CreateColor(GuildNoteDisplayDB.note_colour_table.r, GuildNoteDisplayDB.note_colour_table.g, GuildNoteDisplayDB.note_colour_table.b, GuildNoteDisplayDB.note_colour_table.a)
-    if not GuildNoteDisplayDB["note_in_author_field"] then
-        if GuildNoteDisplayDB["colour_guild_note"] then
-            msg = "|c" .. textColor:GenerateHexColor() .. "(" .. guildNote .. ")|r " .. msg
+    
+    if not GuildNoteDisplayDB["note_in_tooltip"] then
+        if not GuildNoteDisplayDB["note_in_author_field"] then
+            if GuildNoteDisplayDB["colour_guild_note"] then
+                msg = "|c" .. textColor:GenerateHexColor() .. "(" .. guildNote .. ")|r " .. msg
+            else
+                msg = "(" .. guildNote .. ") " .. msg
+            end
         else
-            msg = "(" .. guildNote .. ") " .. msg
+            author = Ambiguate(author, "guild") .. " (" .. guildNote .. ")"
         end
-    else
-        author = Ambiguate(author, "guild") .. " (" .. guildNote .. ")"
     end
     return msg, author
 end
@@ -313,6 +317,40 @@ function app.AddMessageEventFilters()
 	end
 end
 
+-- Hyperlink handling, inspired by how Chattynator (plusmouse) handles it
+function app.AddTooltipToCharacterName()
+	-- Loop through every chat frame so they can all be set up for character name tooltips
+	for i = 1, NUM_CHAT_WINDOWS do
+		if i ~= 2 then --Skip ChatFrame2, which is always Combat Log
+			_G["ChatFrame"..i]:HookScript("OnHyperlinkEnter", function(_, hyperlink)
+				if GuildNoteDisplayDB["note_in_tooltip"] then
+					if (hyperlink:match("^(.-):") == "player") then
+						local name = hyperlink:sub(8)
+						local colon = strfind(name, ":")
+						if colon then
+							name = name:sub(1, colon - 1)
+						end
+
+						local guildNote = app.FindGuildNoteForPlayer(name, GuildNoteDisplayDB["use_officer_note"])
+						local shortName = Ambiguate(name, "short")
+	 					local _, _, isDifferent = app.NormalizeAndCompare(guildNote, shortName)
+
+						if guildNote and guildNote ~= "" and isDifferent then
+							GameTooltip:SetOwner(_G["ChatFrame"..i]:GetParent(), "ANCHOR_CURSOR_LEFT")
+							GameTooltip:ClearLines()
+							GameTooltip:AddLine(guildNote)
+							GameTooltip:Show()
+						end
+					end
+				end
+			end)
+			_G["ChatFrame"..i]:HookScript("OnHyperlinkLeave", function()
+				GameTooltip:Hide()
+			end)
+		end
+	end
+end
+
 -- Settings
 function app.Settings()
 	-- Settings page
@@ -367,6 +405,16 @@ function app.Settings()
 		local variable = "note_in_author_field"
 		local name = L["Note in name field"]
 		local tooltip = L["Note in name field tooltip"]
+		local defaultValue = false
+
+		local setting = RegisterSetting(variable, defaultValue, name)
+		CreateCheckbox(category, setting, tooltip)
+	end
+
+	do --checkbox
+		local variable = "note_in_tooltip"
+		local name = L["Note in tooltip"]
+		local tooltip = L["Note in tooltip tooltip"]
 		local defaultValue = false
 
 		local setting = RegisterSetting(variable, defaultValue, name)
