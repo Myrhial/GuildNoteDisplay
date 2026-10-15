@@ -323,17 +323,24 @@ function app.AddTooltipToCharacterName()
 	for i = 1, NUM_CHAT_WINDOWS do
 		if i ~= 2 then --Skip ChatFrame2, which is always Combat Log
 			_G["ChatFrame"..i]:HookScript("OnHyperlinkEnter", function(_, hyperlink)
-				if (hyperlink:match("^(.-):") == "player") then
-					local name = hyperlink:sub(8)
-					local colon = strfind(name, ":")
-					if colon then
-						name = name:sub(1, colon - 1)
-					end
-					if app.FindGuildNoteForPlayer(name, GuildNoteDisplayDB["use_officer_note"]) and GuildNoteDisplayDB["note_in_tooltip"] then
-						GameTooltip:SetOwner(_G["ChatFrame"..i]:GetParent(), "ANCHOR_CURSOR_LEFT")
-						GameTooltip:ClearLines()
-						GameTooltip:AddLine(app.FindGuildNoteForPlayer(name), GuildNoteDisplayDB["use_officer_note"])
-						GameTooltip:Show()
+				if GuildNoteDisplayDB["note_in_tooltip"] then
+					if (hyperlink:match("^(.-):") == "player") then
+						local name = hyperlink:sub(8)
+						local colon = strfind(name, ":")
+						if colon then
+							name = name:sub(1, colon - 1)
+						end
+
+						local guildNote = app.FindGuildNoteForPlayer(name, GuildNoteDisplayDB["use_officer_note"])
+						local shortName = Ambiguate(name, "short")
+	 					local _, _, isDifferent = app.NormalizeAndCompare(guildNote, shortName)
+
+						if guildNote and guildNote ~= "" and isDifferent then
+							GameTooltip:SetOwner(_G["ChatFrame"..i]:GetParent(), "ANCHOR_CURSOR_LEFT")
+							GameTooltip:ClearLines()
+							GameTooltip:AddLine(guildNote)
+							GameTooltip:Show()
+						end
 					end
 				end
 			end)
