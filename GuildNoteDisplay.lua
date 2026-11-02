@@ -337,7 +337,6 @@ function app.AddTooltipToCharacterName()
 
 						if guildNote and guildNote ~= "" and isDifferent then
 							GameTooltip:SetOwner(_G["ChatFrame"..i]:GetParent(), "ANCHOR_CURSOR")
-							GameTooltip:ClearLines()
 							GameTooltip:AddLine(guildNote)
 							GameTooltip:Show()
 						end
