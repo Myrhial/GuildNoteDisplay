@@ -39,6 +39,10 @@ function app.Initialise()
 		GuildNoteDisplayDB["note_in_author_field"] = false
 	end
 
+	if GuildNoteDisplayDB["note_in_tooltip"] == nil then
+		GuildNoteDisplayDB["note_in_tooltip"] = false
+	end
+	
 	if GuildNoteDisplayDB["normalise_special_characters"] == nil then
 		GuildNoteDisplayDB["normalise_special_characters"] = false
 	end
