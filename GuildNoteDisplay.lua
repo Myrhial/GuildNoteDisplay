@@ -42,7 +42,7 @@ function app.Initialise()
 	if GuildNoteDisplayDB["note_in_tooltip"] == nil then
 		GuildNoteDisplayDB["note_in_tooltip"] = false
 	end
-	
+
 	if GuildNoteDisplayDB["normalise_special_characters"] == nil then
 		GuildNoteDisplayDB["normalise_special_characters"] = false
 	end
@@ -235,7 +235,7 @@ end
 -- Formats the message with the guild note
 function app.FormatMessageWithGuildNote(msg, author, guildNote)
     local textColor = CreateColor(GuildNoteDisplayDB.note_colour_table.r, GuildNoteDisplayDB.note_colour_table.g, GuildNoteDisplayDB.note_colour_table.b, GuildNoteDisplayDB.note_colour_table.a)
-    
+
     if not GuildNoteDisplayDB["note_in_tooltip"] then
         if not GuildNoteDisplayDB["note_in_author_field"] then
             if GuildNoteDisplayDB["colour_guild_note"] then
@@ -290,9 +290,11 @@ function app.AddGuildNoteToLoginLogoutMessage(self, event, msg, ...)
 		end
 
 		if author ~= nil then
-			-- Author needs the realm name added to it
-			if not strfind(author, "-") then
-				author = author .. "-" .. GetNormalizedRealmName()
+			-- Author needs the realm name added to it (but not on Forever!)
+			if not WOW_PROJECT_ID == 18 then
+				if not strfind(author, "-") then
+					author = author .. "-" .. GetNormalizedRealmName()
+				end
 			end
 
 			local guildNote = app.FindGuildNoteForPlayer(author, GuildNoteDisplayDB["use_officer_note"])
