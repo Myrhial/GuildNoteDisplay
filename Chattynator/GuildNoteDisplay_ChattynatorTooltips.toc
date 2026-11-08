@@ -1,0 +1,37 @@
+## Interface: 16001, 120100
+# Version: v1.2.3
+# X-Curse-Project-ID: 1134192
+# X-Wago-ID: jK8XqXKy
+## Title: Guild Note Display: Chattynator Tooltips
+# Notes-enUS: Hi I'm a placeholder note because I don't know the best/standard way to describe these kinds of companion addons
+# Notes-deDE: TRANSLATE_ME
+# Notes-esES: TRANSLATE_ME
+# Notes-esMX: TRANSLATE_ME
+# Notes-frFR: TRANSLATE_ME
+# Notes-itIT: TRANSLATE_ME
+# Notes-koKR: TRANSLATE_ME
+# Notes-ptBR: TRANSLATE_ME
+# Notes-ruRU: TRANSLATE_ME
+# Notes-zhCN: TRANSLATE_ME
+# Notes-zhTW: TRANSLATE_ME
+
+## Author: Myrhial
+## IconTexture: Interface\AddOns\GuildNoteDisplay\GuildNoteDisplay.blp
+
+## LoadWith: GuildNoteDisplay
+## RequiredDeps: Chattynator
+
+# https://warcraft.wiki.gg/wiki/Addon_Categories
+## Category-enUS: Chat
+## Category-deDE: Chat
+## Category-esES: Chat
+## Category-esMX: Chat
+## Category-frFR: Discussion
+## Category-itIT: Chat
+## Category-koKR: 대화
+## Category-ptBR: Bate-papo
+## Category-ruRU: Чат
+## Category-zhCN: 聊天
+## Category-zhTW: 對話
+
+GuildNoteDisplay_ChattynatorTooltips.lua
