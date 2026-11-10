@@ -15,6 +15,7 @@ event:SetScript("OnEvent", function(self, event, ...)
 	end
 end)
 event:RegisterEvent("ADDON_LOADED")
+event:RegisterEvent("PLAYER_LOGIN")
 event:RegisterEvent("CHAT_MSG_SYSTEM")
 
 -- Initial load
@@ -83,8 +84,22 @@ function event:ADDON_LOADED(addOnName, containsBindings)
         app.Settings()
 		app.MinimapIcon()
 		app.AddMessageEventFilters()
-		app.AddTooltipToCharacterName()
     end
+end
+
+-- Set up tooltip notes
+function event:PLAYER_LOGIN()
+	local handler
+	local Chattynator = Chattynator or nil
+
+	if Chattynator then
+		app.AddTooltipToCharacterName_Chattynator()
+		handler = "Chattynator"
+	end
+
+	if not handler then
+		app.AddTooltipToCharacterName()
+	end
 end
 
 -- Color picker
