@@ -338,6 +338,7 @@ function app.AddMessageEventFilters()
 	end
 end
 
+--Create and show a tooltip, inspired by how Chattynator (plusmouse) handles it
 function app.CreateAndShowTooltip(hyperlink, handler)
 	if GuildNoteDisplayDB["note_in_tooltip"] then
 		if (hyperlink:match("^(.-):") == "player") then
@@ -360,7 +361,7 @@ function app.CreateAndShowTooltip(hyperlink, handler)
 	end
 end
 
--- Hyperlink handling, inspired by how Chattynator (plusmouse) handles it
+-- Hyperlink handling (Blizzard ChatFrame)
 function app.AddTooltipToCharacterName()
 	-- Loop through every chat frame so they can all be set up for character name tooltips
 	for i = 1, NUM_CHAT_WINDOWS do
