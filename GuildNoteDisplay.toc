@@ -35,6 +35,7 @@
 
 libs\LibDBIcon-1.0\embeds.xml
 libs\LibDBIcon-1.0\LibDBIcon-1.0\LibDBIcon-1.0.lua
+Chattynator.lua
 GuildNoteDisplay.lua
 Localization\Localization.core.lua
 Localization\Localization.de.lua
