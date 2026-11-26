@@ -461,15 +461,18 @@ function app.Settings()
 	do -- checkbox
 		local variable = "use_officer_note"
 		local name = L["Use the officer note"]
-		local tooltip = L["Use the officer note tooltip"]
 		local defaultValue = false
 
-		if not C_GuildInfo.CanViewOfficerNote() then
-			tooltip = tooltip .. " |n|n|cFFFF0000" .. L["Officer note warning"] .. "|r"
+		local function GetTooltip()
+			local tooltip = L["Use the officer note tooltip"]
+			if not C_GuildInfo.CanViewOfficerNote() then
+				tooltip = tooltip .. "|n|n|cFFFF0000" .. L["Officer note warning"] .. "|r"
+			end
+			return tooltip
 		end
 
 		local setting = RegisterSetting(variable, defaultValue, name)
-		CreateCheckbox(category, setting, tooltip)
+		CreateCheckbox(category, setting, GetTooltip)
 	end
 
 	do -- checkbox
