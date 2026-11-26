@@ -18,4 +18,6 @@ if GetLocale() == "zhCN" then
     L["Hide minimap icon"] = "隐藏小地图图标";
     L["Hide minimap icon tooltip"] = "隐藏此插件的小地图图标。您仍然可以通过输入/gnd或使用插件区来访问设置。";
     L["Officer note warning"] = "你没有军官备注的访问权限。军官备注设置将无法正常工作。";
+    L["Use character settings"] = "使用角色专用设置";
+    L["Use character settings tooltip"] = "仅为此角色保存军官备注和特殊字符设置，而不是整个账号通用。其他所有设置仍为账号通用。";
 end

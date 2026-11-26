@@ -18,4 +18,6 @@ if GetLocale() == "enUS" then
     L["Hide minimap icon"] = "Hide minimap icon";
     L["Hide minimap icon tooltip"] = "Hide the minimap icon for this addon. You can still access the settings by typing /gnd or by using the addon compartment.";
     L["Officer note warning"] = "You do not have officer note access. The officer note setting will not work correctly.";
+    L["Use character settings"] = "Use character-specific settings";
+    L["Use character settings tooltip"] = "Save the officer note and special character settings for this character only, instead of account-wide. All other settings stay account-wide.";
 end

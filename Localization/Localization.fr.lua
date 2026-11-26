@@ -18,4 +18,6 @@ if GetLocale() == "frFR" then
     L["Hide minimap icon"] = "Masquer l'icône de la minicarte";
     L["Hide minimap icon tooltip"] = "Masquez l'icône de la minicarte pour cet addon. Vous pouvez toujours accéder aux paramètres en tapant /gnd ou en utilisant le compartiment d'addon.";
     L["Officer note warning"] = "Vous n'avez pas accès aux notes d'officier. Le paramètre de note d'officier ne fonctionnera pas correctement.";
+    L["Use character settings"] = "Utiliser des paramètres propres au personnage";
+    L["Use character settings tooltip"] = "Enregistre les paramètres de note d'officier et de caractères spéciaux pour ce personnage uniquement, au lieu de tout le compte. Les autres paramètres restent communs au compte.";
 end

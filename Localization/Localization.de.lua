@@ -18,4 +18,6 @@ if GetLocale() == "deDE" then
     L["Hide minimap icon"] = "Minikarten-Symbol ausblenden";
     L["Hide minimap icon tooltip"] = "Blendet das Minikartensymbol für dieses Addon aus. Sie können die Einstellungen weiterhin aufrufen, indem Sie /gnd eingeben oder das Addon-Fach verwenden.";
     L["Officer note warning"] = "Du hast keinen Zugriff auf Offiziersnotizen. Die Offiziersnotiz-Einstellung wird nicht korrekt funktionieren.";
+    L["Use character settings"] = "Charakterspezifische Einstellungen verwenden";
+    L["Use character settings tooltip"] = "Speichert die Einstellungen für Offiziersnotiz und Sonderzeichen nur für diesen Charakter statt accountweit. Alle anderen Einstellungen bleiben accountweit.";
 end

@@ -59,6 +59,53 @@ function app.Initialise()
 	if GuildNoteDisplayDB["hide"] == nil then
 		GuildNoteDisplayDB["hide"] = false
 	end
+
+	-- Declare per-character SavedVariables
+	if not GuildNoteDisplayCharDB then GuildNoteDisplayCharDB = {} end
+
+	if GuildNoteDisplayCharDB["use_character_settings"] == nil then
+		GuildNoteDisplayCharDB["use_character_settings"] = false
+	end
+end
+
+-- Settings that can be overridden per character
+app.CharacterSettingKeys = {
+	use_officer_note = true,
+	normalise_special_characters = true,
+}
+
+-- Whether this character uses its own settings
+function app.UsesCharacterSettings()
+	return GuildNoteDisplayCharDB["use_character_settings"] == true
+end
+
+-- Copy account values into the character table for any keys not yet set
+function app.SeedCharacterSettings()
+	for key in pairs(app.CharacterSettingKeys) do
+		if GuildNoteDisplayCharDB[key] == nil then
+			GuildNoteDisplayCharDB[key] = GuildNoteDisplayDB[key]
+		end
+	end
+end
+
+-- Get a setting, resolving per-character overrides
+function app.GetSetting(key)
+	if app.CharacterSettingKeys[key] and app.UsesCharacterSettings() then
+		local value = GuildNoteDisplayCharDB[key]
+		if value ~= nil then
+			return value
+		end
+	end
+	return GuildNoteDisplayDB[key]
+end
+
+-- Set a setting in whichever table it is currently read from
+function app.SetSetting(key, value)
+	if app.CharacterSettingKeys[key] and app.UsesCharacterSettings() then
+		GuildNoteDisplayCharDB[key] = value
+	else
+		GuildNoteDisplayDB[key] = value
+	end
 end
 
 -- Minimap icon
@@ -228,7 +275,7 @@ function app.NormalizeAndCompare(guildNote, shortName)
 		return nil, nil, false
 	end
 
-    if GuildNoteDisplayDB["normalise_special_characters"] then
+    if app.GetSetting("normalise_special_characters") then
         guildNote = app.NormalizeSpecialCharacters(guildNote)
         shortName = app.NormalizeSpecialCharacters(shortName)
     end
@@ -268,7 +315,7 @@ end
 -- Adds the guild note to the guild chat
 function app.AddGuildNoteToGuildChat(self, event, msg, author, ...)
     if event == "CHAT_MSG_GUILD" or event == "CHAT_MSG_OFFICER" then
-        local guildNote = app.FindGuildNoteForPlayer(author, GuildNoteDisplayDB["use_officer_note"])
+        local guildNote = app.FindGuildNoteForPlayer(author, app.GetSetting("use_officer_note"))
         local shortName = Ambiguate(author, "short")
         local guildNoteForCompare, shortNameForCompare, isDifferent = app.NormalizeAndCompare(guildNote, shortName)
 
@@ -282,7 +329,7 @@ end
 -- Adds the guild note to the party and raid chat
 function app.AddGuildNoteToPartyRaidChat(self, event, msg, author, ...)
     if GuildNoteDisplayDB["display_party_raid_chat"] and (event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_PARTY_LEADER" or event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER") then
-        local guildNote = app.FindGuildNoteForPlayer(author, GuildNoteDisplayDB["use_officer_note"])
+        local guildNote = app.FindGuildNoteForPlayer(author, app.GetSetting("use_officer_note"))
         local shortName = Ambiguate(author, "short")
         local guildNoteForCompare, shortNameForCompare, isDifferent = app.NormalizeAndCompare(guildNote, shortName)
 
@@ -312,7 +359,7 @@ function app.AddGuildNoteToLoginLogoutMessage(self, event, msg, ...)
 				end
 			end
 
-			local guildNote = app.FindGuildNoteForPlayer(author, GuildNoteDisplayDB["use_officer_note"])
+			local guildNote = app.FindGuildNoteForPlayer(author, app.GetSetting("use_officer_note"))
 			local shortName = Ambiguate(author, "short")
 			local guildNoteForCompare, shortNameForCompare, isDifferent = app.NormalizeAndCompare(guildNote, shortName)
 
@@ -348,7 +395,7 @@ function app.CreateAndShowTooltip(hyperlink, handler)
 				name = name:sub(1, colon - 1)
 			end
 
-			local guildNote = app.FindGuildNoteForPlayer(name, GuildNoteDisplayDB["use_officer_note"])
+			local guildNote = app.FindGuildNoteForPlayer(name, app.GetSetting("use_officer_note"))
 			local shortName = Ambiguate(name, "short")
 	 		local _, _, isDifferent = app.NormalizeAndCompare(guildNote, shortName)
 
@@ -409,6 +456,43 @@ function app.Settings()
 		return setting;
 	end
 
+	-- Settings that can be stored per character. These resolve through app.GetSetting/app.SetSetting
+	-- so they follow the "use character settings" toggle.
+	local characterSettings = {}
+
+	local function RegisterCharacterSetting(variableKey, defaultValue, name)
+		local uniqueVariable = "GuildNoteDisplay_" .. variableKey;
+
+		local function GetValue()
+			local value = app.GetSetting(variableKey)
+			if value == nil then
+				return defaultValue
+			end
+			return value
+		end
+
+		local function SetValue(value)
+			app.SetSetting(variableKey, value)
+		end
+
+		local setting;
+		if Settings.RegisterProxySetting then
+			setting = Settings.RegisterProxySetting(category, uniqueVariable, type(defaultValue), name, defaultValue, GetValue, SetValue);
+		else
+			-- Fallback for clients without proxy settings: route table access through the resolvers
+			local proxyTable = setmetatable({}, {
+				__index = function(_, key) return app.GetSetting(key) end,
+				__newindex = function(_, key, value) app.SetSetting(key, value) end,
+			})
+			setting = Settings.RegisterAddOnSetting(category, uniqueVariable, variableKey, proxyTable, type(defaultValue), name, defaultValue);
+		end
+
+		Settings.SetOnValueChangedCallback(uniqueVariable, OnSettingChanged);
+		characterSettings[variableKey] = setting
+
+		return setting;
+	end
+
 	do -- checkbox
 		local variable = "colour_guild_note"
 		local name = L["Colour guild note"]
@@ -448,13 +532,37 @@ function app.Settings()
 		CreateCheckbox(category, setting, tooltip)
 	end
 
+	do -- checkbox (per character)
+		local variable = "use_character_settings"
+		local name = L["Use character settings"]
+		local tooltip = L["Use character settings tooltip"]
+		local defaultValue = false
+
+		local setting = Settings.RegisterAddOnSetting(category, "GuildNoteDisplay_" .. variable, variable, GuildNoteDisplayCharDB, type(defaultValue), name, defaultValue);
+		CreateCheckbox(category, setting, tooltip)
+		setting:SetValueChangedCallback(function()
+			if app.UsesCharacterSettings() then
+				app.SeedCharacterSettings()
+			end
+
+			-- Refresh the per-character settings so they show the values now in effect
+			for key, characterSetting in pairs(characterSettings) do
+				if characterSetting.NotifyUpdate then
+					characterSetting:NotifyUpdate()
+				else
+					characterSetting:SetValue(app.GetSetting(key))
+				end
+			end
+		end)
+	end
+
 	do -- checkbox
 		local variable = "normalise_special_characters"
 		local name = L["Normalise special characters"]
 		local tooltip = L["Normalise special characters tooltip"]
 		local defaultValue = false
 
-		local setting = RegisterSetting(variable, defaultValue, name)
+		local setting = RegisterCharacterSetting(variable, defaultValue, name)
 		CreateCheckbox(category, setting, tooltip)
 	end
 
@@ -471,7 +579,7 @@ function app.Settings()
 			return tooltip
 		end
 
-		local setting = RegisterSetting(variable, defaultValue, name)
+		local setting = RegisterCharacterSetting(variable, defaultValue, name)
 		CreateCheckbox(category, setting, GetTooltip)
 	end
 

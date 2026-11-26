@@ -18,4 +18,6 @@ if GetLocale() == "koKR" then
     L["Hide minimap icon"] = "미니맵 아이콘 숨기기";
     L["Hide minimap icon tooltip"] = "이 애드온의 미니맵 아이콘을 숨깁니다. /gnd를 입력하거나 애드온 구획을 사용하여 설정에 여전히 액세스할 수 있습니다.";
     L["Officer note warning"] = "장교 메모에 대한 접근 권한이 없습니다. 장교 메모 설정이 올바르게 작동하지 않습니다.";
+    L["Use character settings"] = "캐릭터별 설정 사용";
+    L["Use character settings tooltip"] = "장교 메모 및 특수 문자 설정을 계정 전체가 아닌 이 캐릭터에만 저장합니다. 다른 모든 설정은 계정 전체에 적용됩니다.";
 end
