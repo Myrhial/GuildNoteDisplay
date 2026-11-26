@@ -464,6 +464,10 @@ function app.Settings()
 		local tooltip = L["Use the officer note tooltip"]
 		local defaultValue = false
 
+		if not C_GuildInfo.CanViewOfficerNote() then
+			tooltip = tooltip .. " |n|n|cFFFF0000" .. L["Officer note warning"] .. "|r"
+		end
+
 		local setting = RegisterSetting(variable, defaultValue, name)
 		CreateCheckbox(category, setting, tooltip)
 	end
